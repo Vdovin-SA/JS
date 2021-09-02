@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Сортировка</title>
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css' 
+	integrity='sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm' crossorigin='anonymous'>
+<script src='https://code.jquery.com/jquery-3.6.0.js' 
+	integrity='sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=' crossorigin='anonymous'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js' 
+	integrity='sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q' crossorigin='anonymous'></script>
+<script src='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js' 
+	integrity='sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl' crossorigin='anonymous'></script>
+<style>
+BODY {padding: 10px;}
+.element {background-color: #f00; border-left: 1px #FFF solid; display: inline-block;}
+.work {background-color: #007bff;}
+.search {background-color: #4af360;}
+</style>
+</head>
+<body>
+	<form>
+        <div class="form-group">
+            <label>Количество элементов <span></span></label>
+            <input type="range" class="form-control-range" id="count" 
+            min="2" max="100" step="1" value="10" onchange="set_label_value(this)">
+        </div>        
+        <div class="form-group">
+            <label>Задержка анимации <span></span></label>
+            <input type="range" class="form-control-range" id="speed" 
+            min="0" max="1000" step="100" value="300" onchange="set_label_value(this)">
+        </div>
+        <div class="form-group">
+            <label>Поиск по значению</label>
+            <input type="text" class="form-control" id="search_value">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="create()">Создать</button>
+        <button type="button" class="btn btn-primary" onclick="create()">Перемешать</button>
+        <button type="button" class="btn btn-primary" onclick="sort_bubble(true)">Сорт &#5125;</button>
+        <button type="button" class="btn btn-primary" onclick="sort_bubble(false)">Сорт &#5130;</button>
+        <button type="button" class="btn btn-primary" onclick="search()">Поиск</button>
+        <button type="button" class="btn btn-primary" onclick="window.location.reload()">Перезапустить</button>
+    </form>
+    <br>
+    <div id="output">
+
+    </div>
+</body>
+</html>
+
+<script>
+var div = '#output';
+var div_height_max = 300;
+var elements = [];
+var counter = 0;
+
+function create(){
+    var count = $('#count').val() || 10;
+    var array = array_shuffle(array_create(count));
+    elements = array;
+
+    $(div).html(create_html());     
+}
+function create_html(){
+    if(elements.length==0){ return false; }
+
+    var out = "";
+    var div_width = ($(div).width() || 500) / elements.length;
+    //div_width = Math.floor(div_width); // Округление в меньшую сторону
+
+    for (var index = 0; index < elements.length; index++) {
+        var div_height = Math.floor( ( elements[index] / elements.length ) * div_height_max );
+        out+= '<div class="element" style="width: '+ div_width +'px; height: '+ div_height +'px;"></div>';       
+    }
+    return out;
+}
+
+function array_create(count_max){
+    var array = [];
+    for (var index = 0; index < count_max; index++) {
+        array.push(index + 1);        
+    }
+    return array;
+}
+function array_shuffle(array){
+    array = array || [];
+    return array.sort(() => Math.random() - 0.5);
+}
+async function sort_bubble(flag){
+    if(elements.length==0){ return false; }
+    var n = elements.length;
+    counter = 0;
+
+    for (var i = 0, endI = elements.length - 1; i < endI; i++) {
+        for (var j = 0, endJ = endI - i; j < endJ; j++) {
+            $(div+'>div:eq('+j+')').addClass('work');
+            $(div+'>div:eq('+(j+1)+')').addClass('work');
+            var need_swap = flag ? elements[j] > elements[j + 1] : elements[j] < elements[j + 1];
+            if (need_swap) {
+                var tmp = elements[j];
+                elements[j] = elements[j + 1];
+                elements[j + 1] = tmp;
+                var ms = $('#speed').val() || 300;
+                if(ms>0){ await sleep(ms); }              
+            }  
+            $(div).html(create_html());          
+            counter++;
+        }
+    }
+    $(div).html(create_html());
+    if(console){ console.log('Количество проходов', counter); }
+}
+function sleep(ms) {    
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+function search(){
+    var value = $('#search_value').val();
+    value = Number.parseInt(value);
+    if(value > 0 && value <= elements.length){
+        for (var index = 0; index < elements.length; index++) {
+            if(elements[index] == value){
+                $(div+'>div:eq('+index+')').addClass('search');
+                return true;
+            }            
+        }
+    }else{
+        alert('Введите число от 1 до ' + elements.length);
+    }
+}
+function set_label_value(item){
+    if(!item && item.id == "" ){ return false; }
+    $('#'+item.id).parent()
+    .find('label>span').html(' : ' + item.value)
+}
+</script>
