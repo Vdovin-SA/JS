@@ -1,0 +1,83 @@
+.logo {
+    padding: 20px 0 0 20px;
+}
+
+.users{
+    font-size: 24px;
+    margin-top: 20px;
+}
+
+.users tr{
+	/* background-color: #d4f9df; */
+}
+
+.boss, .programmer {
+}
+
+.boss:before {
+    content: "\e007";
+    color: #d42222;
+    margin-right: 10px;
+    font-family: "Glyphicons Halflings";
+    font-size: 20px;
+}
+
+.programmer:before {
+    content: "\e233";
+    color: #1b689e;
+    margin-right: 10px;
+    font-family: "Glyphicons Halflings";
+    font-size: 20px;
+}
+/* glyphicon */ 
+.VSglyphicon:before {
+    position: relative;
+    top: 0px;
+    display: revert;
+    margin-right: 10px;
+    font-style: normal;
+    font-weight: 400;
+    font-family: "Glyphicons Halflings";
+    font-size: 20px;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.f_red{ color: #d42222; }
+.f_blue { color: #1b689e; }
+.f_green{ color: #54d422; }
+.f_orange { color: #d47222; }
+.f_dark{ color: #2b2323; }
+
+
+
+.users td{
+	border-bottom: 1px solid #000;
+    padding: 0px 11px;
+    position: relative;
+}
+
+.users input{
+	width: 50px;
+    margin-bottom: 10px;
+}
+
+.bar_limit {
+    border-right: 4px solid #f00;
+    width: 50%;
+    height: 100%;
+    display: block;
+    position: absolute;
+    top: 0;
+    z-index: 10;
+}
+
+.bar {
+    width: 0%;
+    background-color: #58fd89;
+    height: 70%;
+    position: absolute;
+    top: 15%;
+    border: 1px solid #000;
+}
