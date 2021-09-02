@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="referrer" content="unsafe-url">
+	<title>БКС</title>
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css' 
+    	integrity='sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm' crossorigin='anonymous'>
+    <script src='https://code.jquery.com/jquery-3.6.0.js' 
+	    integrity='sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=' crossorigin='anonymous'></script>
+<style>
+BODY {padding: 10px;}
+.element {background-color: #f00; border-left: 1px #FFF solid; display: inline-block;}
+.work {background-color: #007bff;}
+.search {background-color: #4af360;}
+</style>
+</head>
+<body>
+    <div class="line">
+        <input class="btn btn-primary" type="button" value="Вдовин noCache"
+        onClick="load('', 'noCache')">
+        <input class="btn btn-primary" type="button" value="Вдовин + Cache"
+        onClick="load('', '')">
+        <input class="btn btn-danger" type="button" value="Админ + Cache"
+        onClick="load2('2n', '')">
+        <input class="btn btn-danger" type="button" value="Админ noCache"
+        onClick="load('2n', 'noCache')">
+        <div class="line" id="result">Замер скорости:</div>
+    </div>
+
+    <table class="table table-hover">
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+</body>
+</html>
+
+<script>
+var D = {
+    url : 'https://s-nsk01-id00014.global.bcs/web/bcs_cache.nsf/ViewCache',
+    url_attr : '?OpenAgent&viewName=OfficeMemoByNumber',
+    div_result : $('#result'),
+    timer : []
+}
+
+
+function load(sufix, cache){
+    var url = D.url + sufix + D.url_attr + '&cache=' + cache
+    D.timer[0] = timer_new();
+    $.get( url, function( data ) {
+        D.div_result.append('<br>Time - '+ timer_calc(D.timer[0], timer_new()) +' ms');
+    });    
+}
+function timer_new(){
+    return performance.now();
+}
+function timer_calc(t0, t1){
+    return (t1 - t0).toFixed(2);
+}
+
+
+</script>
