@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Математический тренажер</title>
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css' 
+	integrity='sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm' crossorigin='anonymous'>
+<script src='https://code.jquery.com/jquery-3.6.0.js' 
+	integrity='sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=' crossorigin='anonymous'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js' 
+	integrity='sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q' crossorigin='anonymous'></script>
+<script src='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js' 
+	integrity='sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl' crossorigin='anonymous'></script>
+<style>
+BODY {padding: 10px;}
+#panel { width: 250px; margin: 0 auto; }
+#panel>button { width: 70px; margin: 2px 4px; }
+</style>
+</head>
+<body>
+    <h2 class="container text-center">Математический тренажер</h2>
+    <div class="container">
+        <div class="row">
+          <div class="col">
+            <div class="row"><h4>Решите пример:</h4></div>
+            <div class="container text-center" id="task">a + b = ?</div>
+            <div class="container text-center" id="answer">0</div>
+            <div class="" id="panel">
+                <button type="button" class="btn btn-primary" onclick="add_number(1)">1</button>
+                <button type="button" class="btn btn-primary" onclick="add_number(2)">2</button>
+                <button type="button" class="btn btn-primary" onclick="add_number(3)">3</button>
+                <button type="button" class="btn btn-primary" onclick="add_number(4)">4</button>
+                <button type="button" class="btn btn-primary" onclick="add_number(5)">5</button>
+                <button type="button" class="btn btn-primary" onclick="add_number(6)">6</button>
+                <button type="button" class="btn btn-primary" onclick="add_number(7)">7</button>
+                <button type="button" class="btn btn-primary" onclick="add_number(8)">8</button>
+                <button type="button" class="btn btn-primary" onclick="add_number(9)">9</button>
+                <button type="button" class="btn btn-danger" onclick="cancel()">X</button>
+                <button type="button" class="btn btn-primary" onclick="add_number(0)">0</button>
+                <button type="button" class="btn btn-success" onclick="calc()">&#5125;</button>
+            </div>
+          </div>
+          <div class="col">
+            <div class="col">
+                <h4>Ответы:</h4>
+                <h4>Настрйки:</h4>
+                <div class="form-group">
+                    <label>Количество примеров: <span id="count_tasks_label"></span></label>
+                    <input type="range" class="form-control-range" id="count_tasks" 
+                    min="10" max="50" step="5" value="10" onchange="set_title_count_tasks()">
+                </div>
+                <button type="button" class="btn btn-primary" onclick="create_tasks()">Создать задания</button>
+            </div>
+          </div>
+        </div>
+    </div>
+</body>
+</html>
+<script>
+// Старт приложения
+$( document ).ready(function() {
+    if(console){ console.log( "Start!" ); }
+    create_tasks();
+    get_task();
+});
+
+// Панель ввода ответов
+var div_answer = $('#answer');
+var div_task = $('#task');
+
+// Добавить число в ответ
+function add_number(number){
+    var old_number = div_answer.html();
+    if(old_number == '0'){
+        old_number = '';
+    }
+    div_answer.html(old_number + number);
+}
+function cancel(){ div_answer.html('0'); }
+
+
+
+var tasks = [];
+var task_current = 0;
+var delay = 600;
+
+//Создать пример
+function create_tasks(){
+    var i_max = get_count_tasks();
+    tasks = [];
+
+    for (let i = 0; i < i_max; i++) {
+        tasks.push(create_task(i));
+    }
+    if(console){ console.log( "Create tasks: " + tasks.length ); }
+}
+function create_task(i, action = '+'){    
+    var number_1 = get_number(1, 100);
+    var number_2 = get_number(30, 100);
+
+    if(action == '+'){
+        return {
+            index: i,
+            action: action,
+            number_1: number_1,
+            number_2: number_2,
+            answer: number_1 + number_2,
+            answer_user: -1,
+            answer_count: 0
+        }
+    }
+
+    return {};
+}
+function shuffle_tasks(array){
+    return array.sort(() => Math.random() - 0.5);
+}
+function get_task(){
+    var task = shuffle_tasks(tasks.filter( item => item.answer_user < 0));
+    if(task.length == 0 ){
+        if(console){ console.log( "All tasks is calc!" ); }
+        return get_answers();
+    }
+    task = task[0];
+    task_current = task.index;
+    div_task.html(task.number_1 + ' ' + task.action + ' ' + task.number_2 + ' = ?');
+    div_answer.html('0');
+}
+function calc(){
+    var task = tasks[task_current];
+    task.answer_count++;
+    answer_user = parseInt(div_answer.html());
+    if(answer_user == task.answer){
+        task.answer_user = answer_user;
+        div_answer.delay(3000).css("background-color","green");
+    }else{
+        div_answer.delay(3000).css("background-color","red");
+    }
+    get_task();
+}
+function get_answers(){
+    div_task.html('Все примеры решены!');
+    div_answer.html('0');
+}
+
+
+// Получить количество примеров
+function get_count_tasks(){ return parseInt($('#count_tasks').val()); }
+function set_title_count_tasks(){
+    $('#count_tasks_label').html($('#count_tasks').val());
+}
+
+// Получить случайное число в диапазоне
+function get_number(min = 1, max = 10){
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+
+</script>
