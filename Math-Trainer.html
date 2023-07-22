@@ -42,11 +42,31 @@ BODY {padding: 10px;}
           <div class="col">
             <div class="col">
                 <h4>Ответы:</h4>
+                <div class="container" id="answers"></div>
                 <h4>Настрйки:</h4>
                 <div class="form-group">
                     <label>Количество примеров: <span id="count_tasks_label"></span></label>
                     <input type="range" class="form-control-range" id="count_tasks" 
-                    min="10" max="50" step="5" value="10" onchange="set_title_count_tasks()">
+                    min="5" max="50" step="5" value="10" onchange="set_title_count_tasks()">
+                </div>
+                <div class="form-group">
+                    <label>Математические действия: </label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="actionSum" checked>
+                        <label class="form-check-label" for="actionSum">Сумма</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="actionDif" checked>
+                        <label class="form-check-label" for="actionDif">Вычетание</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="actionMul">
+                        <label class="form-check-label" for="actionMul">Умножение</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="actionDiv">
+                        <label class="form-check-label" for="actionDiv">Деление</label>
+                    </div>
                 </div>
                 <button type="button" class="btn btn-primary" onclick="create_tasks()">Создать задания</button>
             </div>
@@ -59,12 +79,13 @@ BODY {padding: 10px;}
 // Старт приложения
 $( document ).ready(function() {
     if(console){ console.log( "Start!" ); }
+    set_title_count_tasks();
     create_tasks();
-    get_task();
 });
 
 // Панель ввода ответов
 var div_answer = $('#answer');
+var div_answers = $('#answers');
 var div_task = $('#task');
 
 // Добавить число в ответ
@@ -88,28 +109,54 @@ function create_tasks(){
     var i_max = get_count_tasks();
     tasks = [];
 
+    // Список доступных математических действий
+    var actions = [];
+    if($('#actionSum').is(':checked')){ actions.push('+'); }
+    if($('#actionDif').is(':checked')){ actions.push('-'); }
+    if($('#actionMul').is(':checked')){ actions.push('*'); }
+    if($('#actionDiv').is(':checked')){ actions.push('/'); }
+    if(actions.length == 0){
+        return alert('Не выбраны математические действия!');
+    }
+
     for (let i = 0; i < i_max; i++) {
-        tasks.push(create_task(i));
+        action_index = (i % actions.length);
+        tasks.push(create_task(i, actions[action_index]));
     }
     if(console){ console.log( "Create tasks: " + tasks.length ); }
+    div_answers.html('');
+    get_task();
 }
 function create_task(i, action = '+'){    
     var number_1 = get_number(1, 100);
     var number_2 = get_number(30, 100);
 
-    if(action == '+'){
-        return {
+    // Действие по умолчанию
+    var task = {
             index: i,
             action: action,
             number_1: number_1,
             number_2: number_2,
             answer: number_1 + number_2,
             answer_user: -1,
-            answer_count: 0
-        }
+            answer_count: -1
+        };
+
+    if(action == '-'){
+        task.number_1 = number_1 + number_2;
+        task.answer = number_1;
     }
 
-    return {};
+    if(action == '*'){
+        task.answer = number_1 * number_2;
+    }
+
+    if(action == '/'){
+        task.number_1 = number_1 * number_2;
+        task.answer = number_1;
+    }
+
+    return task;
 }
 function shuffle_tasks(array){
     return array.sort(() => Math.random() - 0.5);
@@ -131,15 +178,32 @@ function calc(){
     answer_user = parseInt(div_answer.html());
     if(answer_user == task.answer){
         task.answer_user = answer_user;
-        div_answer.delay(3000).css("background-color","green");
+        //div_answer.delay(3000).css("background-color","green");
     }else{
-        div_answer.delay(3000).css("background-color","red");
+        //div_answer.delay(3000).css("background-color","red");
     }
     get_task();
 }
 function get_answers(){
     div_task.html('Все примеры решены!');
     div_answer.html('0');
+
+    var html = '';
+    for (let i = 0; i < tasks.length; i++) {
+        var task = tasks[i];
+        html+= (i+1) + ') ' + task.number_1 + ' ' + task.action + ' ' + task.number_2 + ' = ' + task.answer;
+        if(task.answer_count == 1){
+            html+= ' ('+ task.answer_count + ' ошибкa)';
+        }
+        if(task.answer_count >= 2 && task.answer_count <= 4){
+            html+= ' ('+ task.answer_count + ' ошибки)';
+        }
+        if(task.answer_count >= 5){
+            html+= ' ('+ task.answer_count + ' ошибок)';
+        }
+        html+= '<br>';
+    }
+    div_answers.html(html);
 }
 
 
